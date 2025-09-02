@@ -15,12 +15,7 @@ interface ChatMessage {
   isUser: boolean;
 }
 
-interface Chat {
-  id: string;
-  title: string;
-  timestamp: Date;
-  messages: ChatMessage[];
-}
+
 
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -41,24 +36,24 @@ export default function Home() {
 
   const handleNewChat = () => {
     const newChat: Chat = {
-      id: Date.now().toString(),
+      _id: Date.now().toString(),
       title: 'New Chat',
       timestamp: new Date(),
       messages: [],
     };
     setChats((prev) => [newChat, ...prev]);
-    setActiveChat(newChat.id);
+    setActiveChat(newChat._id);
     setMessages([]);
   };
 
   const handleSelectChat = (chatId: string) => {
     setActiveChat(chatId);
-    const chat = chats.find((c) => c.id === chatId);
+    const chat = chats.find((c) => c._id === chatId);
     if (chat) {
       setMessages(chat.messages);
     }
   };
-
+/*
   const handleSendMessage = async (message: string) => {
     // Add user message to chat
     const userMessage: ChatMessage = { content: message, isUser: true };
@@ -119,7 +114,119 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }; 
+*/
+
+
+interface Chat {
+  _id: string;
+  title: string;
+  timestamp: Date;
+  messages: ChatMessage[];
+}
+
+const handleSendMessage = async (message: string) => {
+  const userMessage: ChatMessage = { content: message, isUser: true };
+  const updatedMessages = [...messages, userMessage];
+  setMessages(updatedMessages);
+  setIsLoading(true);
+
+  const newTitle = message.slice(0, 30) + "...";
+
+  if (activeChat) {
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat._id === activeChat
+          ? { ...chat, messages: updatedMessages, title: newTitle }
+          : chat
+      )
+    );
+  }
+
+  try {
+    let aiReply: string;
+
+    if (selectedModel.useAIClient) {
+      // Fetch from your API route (streamed GPT-5 response)
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: message }),
+      });
+
+      // Read the streamed response as text
+      aiReply = await response.text();
+    } else {
+      // Hugging Face Space fetch (unchanged)
+      const response = await fetch(selectedModel.endpoint!, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: message }),
+      });
+      const data = await response.json();
+      aiReply = data.response;
+    }
+
+    const aiMessage: ChatMessage = { content: aiReply, isUser: false };
+    const newMessages = [...updatedMessages, aiMessage];
+    setMessages(newMessages);
+
+    if (activeChat) {
+      setChats((prev) =>
+        prev.map((chat) =>
+          chat._id === activeChat ? { ...chat, messages: newMessages } : chat
+        )
+      );
+    }
+
+    // Save chat to MongoDB
+    if (session?.user?.email) {
+      await fetch("/api/chatlogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          userId: session.user.email, 
+          title: newTitle, 
+          messages: newMessages 
+        }),
+      });
+    }
+
+  } catch (error) {
+    console.error("Error:", error);
+    const errorMessage: ChatMessage = {
+      content: "Sorry, something went wrong. Please try again.",
+      isUser: false,
+    };
+    setMessages((prev) => [...prev, errorMessage]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const fetchChats = async () => {
+        try {
+          const response = await fetch('/api/chatlogs');
+          const data = await response.json();
+          if (data.success) {
+            setChats(data.chatLogs);
+            if (data.chatLogs.length > 0) {
+              setActiveChat(data.chatLogs[0]._id);
+              setMessages(data.chatLogs[0].messages);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch chats:', error);
+        }
+      };
+      fetchChats();
+    }
+  }, [status]);
 
   // Redirect to sign in if not authenticated
   useEffect(() => {

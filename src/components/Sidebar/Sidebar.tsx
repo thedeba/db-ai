@@ -2,10 +2,16 @@
 
 import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon, Cog6ToothIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 
+interface ChatMessage {
+  content: string;
+  isUser: boolean;
+}
+
 interface Chat {
-  id: string;
+  _id: string;
   title: string;
   timestamp: Date;
+  messages: ChatMessage[];
 }
 
 interface SidebarProps {
@@ -55,16 +61,18 @@ export default function Sidebar({
         )}
         {chats.map((chat) => (
           <button
-            key={chat.id}
-            onClick={() => onSelectChat(chat.id)}
-            className={`flex items-center gap-2 w-full p-3 hover:bg-gray-700 transition-colors ${
-              activeChat === chat.id ? 'bg-gray-700' : ''
+            key={chat._id}
+            onClick={() => onSelectChat(chat._id)}
+            className={`flex items-center gap-2 w-full p-3 hover:bg-gray-700 transition-colors ${ 
+              activeChat === chat._id ? 'bg-gray-700' : ''
             }`}
             title={isCollapsed ? chat.title : undefined}
           >
             <ChatBubbleLeftIcon className="h-5 w-5 flex-shrink-0" />
             {!isCollapsed && (
-              <div className="flex-1 text-left truncate">{chat.title}</div>
+              <div className="flex-1 text-left truncate">
+                {chat.title || (chat.messages && chat.messages.length > 0 ? chat.messages[0].content.slice(0, 30) + "..." : 'Chat')}
+              </div>
             )}
           </button>
         ))}

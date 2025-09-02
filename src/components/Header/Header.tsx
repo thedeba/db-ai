@@ -6,8 +6,11 @@ import Image from 'next/image';
 import Profile from '@/components/Profile/Profile';
 
 interface Model {
+  id?: string;
   name: string;
-  endpoint: string;
+  endpoint?: string;
+  description?: string;
+  useAIClient?: boolean;
 }
 
 interface HeaderProps {
@@ -41,11 +44,11 @@ export default function Header({
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700 bg-[var(--background)] text-[var(--foreground)]">
-      
+
       {/* Logo */}
       <div className="flex items-center gap-2">
         <Image
-          src="/next.svg"
+          src="/logo.svg"
           alt="Logo"
           width={32}
           height={32}
@@ -56,13 +59,13 @@ export default function Header({
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-className="
+            className="
       group flex items-center gap-1 px-3 py-2 rounded-lg
       bg-[var(--background)] text-[var(--foreground)]
       focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
     "          >
             {selectedModel.name}
-            <ChevronDownIcon className="w-4 h-4 text-[var(--foreground)]" />
+            <ChevronDownIcon className="w-15 h-4 text-[var(--foreground)]" />
           </button>
 
           {dropdownOpen && (
@@ -74,9 +77,15 @@ className="
                     onSelectModel(model);
                     setDropdownOpen(false);
                   }}
-                  className="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                  className="px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-300 cursor-pointer"
                 >
                   {model.name}
+
+                  {model.description && (
+                    <div className="text-xs text-gray-200 dark:text-gray-600">
+                      {model.description}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
