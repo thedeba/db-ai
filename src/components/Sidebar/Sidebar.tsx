@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface ChatMessage {
   content: string;
@@ -19,17 +19,19 @@ interface SidebarProps {
   activeChat: string | null;
   onNewChat: () => void;
   onSelectChat: (chatId: string) => void;
+  onDeleteChat: (chatId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
 
-export default function Sidebar({ 
-  chats, 
-  activeChat, 
-  onNewChat, 
+export default function Sidebar({
+  chats,
+  activeChat,
+  onNewChat,
   onSelectChat,
+  onDeleteChat,
   isCollapsed = false,
-  onToggleCollapse = () => {}
+  onToggleCollapse = () => {},
 }: SidebarProps) {
   return (
     <div className={`relative flex flex-col ${isCollapsed ? 'w-16' : 'w-64'} bg-gray-800 dark:bg-gray-900 text-white h-screen transition-all duration-200`}>
@@ -60,21 +62,34 @@ export default function Sidebar({
           <div className="px-3 py-2 text-sm text-gray-400">Recent chats</div>
         )}
         {chats.map((chat) => (
-          <button
+          <div
             key={chat._id}
-            onClick={() => onSelectChat(chat._id)}
-            className={`flex items-center gap-2 w-full p-3 hover:bg-gray-700 transition-colors ${ 
+            className={`flex items-center w-full p-3 hover:bg-gray-700 transition-colors ${ 
               activeChat === chat._id ? 'bg-gray-700' : ''
             }`}
-            title={isCollapsed ? chat.title : undefined}
           >
-            <ChatBubbleLeftIcon className="h-5 w-5 flex-shrink-0" />
+            <button
+              onClick={() => onSelectChat(chat._id)}
+              className="flex items-center gap-2 flex-1 text-left"
+              title={isCollapsed ? chat.title : undefined}
+            >
+              <ChatBubbleLeftIcon className="h-5 w-5 flex-shrink-0" />
+              {!isCollapsed && (
+                <div className="flex-1 truncate">
+                  {chat.title || (chat.messages && chat.messages.length > 0 ? chat.messages[0].content.slice(0, 30) + "..." : 'Chat')}
+                </div>
+              )}
+            </button>
             {!isCollapsed && (
-              <div className="flex-1 text-left truncate">
-                {chat.title || (chat.messages && chat.messages.length > 0 ? chat.messages[0].content.slice(0, 30) + "..." : 'Chat')}
-              </div>
+              <button
+                onClick={() => onDeleteChat(chat._id)}
+                className="ml-2 p-1 rounded-md hover:bg-gray-600"
+                title="Delete Chat"
+              >
+                <TrashIcon className="h-4 w-4 text-gray-400" />
+              </button>
             )}
-          </button>
+          </div>
         ))}
       </div>
 

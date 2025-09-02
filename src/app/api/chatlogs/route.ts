@@ -36,3 +36,32 @@ export async function POST(req: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Chat ID is required' }, { status: 400 });
+    }
+
+    await connectDB();
+    const result = await ChatLog.deleteOne({ _id: id, user: session.user.email });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ success: false, error: 'Chat not found or not authorized' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Chat deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ success: false, error: 'Failed to delete chat' }, { status: 500 });
+  }
+}
+

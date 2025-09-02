@@ -207,6 +207,27 @@ const handleSendMessage = async (message: string) => {
 
 
 
+  const handleDeleteChat = async (chatId: string) => {
+  try {
+    const response = await fetch(`/api/chatlogs?id=${chatId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      setChats((prev) => prev.filter((chat) => chat._id !== chatId));
+      if (activeChat === chatId) {
+        setActiveChat(null);
+        setMessages([]);
+      }
+    } else {
+      console.error('Failed to delete chat');
+    }
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+  }
+};
+
+
   useEffect(() => {
     if (status === 'authenticated') {
       const fetchChats = async () => {
@@ -256,6 +277,7 @@ const handleSendMessage = async (message: string) => {
           activeChat={activeChat}
           onNewChat={handleNewChat}
           onSelectChat={handleSelectChat}
+          onDeleteChat={handleDeleteChat}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
