@@ -16,7 +16,6 @@ let clientPromise: Promise<MongoClient>;
 
 // Extend the NodeJS global type to avoid redeclaration errors
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 

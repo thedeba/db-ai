@@ -17,7 +17,6 @@ const nextConfig = {
 
   experimental: {
     // Allow dev requests from both localhost and LAN IP
-    allowedDevOrigins: ['http://localhost:3000', 'http://192.168.1.2:3000'],
   },
   // Optional: keep your headers config for other CORS needs
   async headers() {

@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon, Cog6ToothIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 interface ChatMessage {
   content: string;
@@ -79,19 +79,7 @@ export default function Sidebar({
       </div>
 
       {/* Bottom Buttons: Settings & Admin Login */}
-      {/*
-      <div className="flex flex-col px-3 py-2 gap-2 border-t border-gray-700">
-
-        <button
-          className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition-colors"
-          title="Admin Login"
-          onClick={() => window.location.href = '/admin/login'}
-        >
-          <LockClosedIcon className="h-5 w-5" />
-          {!isCollapsed && <span>Admin Login</span>}
-        </button>
-      </div>
-      */}
+      
     </div>
   );
 }
