@@ -1,22 +1,3 @@
-/*import NextAuth from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-
-export const authOptions = {
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-  ],
-  pages: {
-    signIn: '/auth/signin',
-  },
-};
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
-*/
-
 import NextAuth from "next-auth";
 import { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
@@ -24,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
+import bcrypt from 'bcryptjs';
 
 export const authOptions = {
   providers: [
@@ -38,22 +20,26 @@ export const authOptions = {
       name: "Admin Login",
       credentials: {
         username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "text" },
       },
       async authorize(credentials) {
-        const adminUser = {
-          id: "1",
-          name: "Admin",
-          email: "admin@example.com",
-          role: "admin",
-        };
+        if (!credentials) {
+          return null;
+        }
 
-        // Replace with a secure password check in production
-        if (
-          credentials?.username === "admin" &&
-          credentials?.password === "admin123"
-        ) {
-          return adminUser;
+        const client = await clientPromise;
+        const db = client.db();
+        const adminCollection = db.collection('admin');
+
+        const adminUser = await adminCollection.findOne({ username: credentials.username });
+
+        if (adminUser && await bcrypt.compare(credentials.password, adminUser.password)) {
+          return {
+            id: adminUser._id.toString(),
+            name: adminUser.username,
+            email: adminUser.email || '',
+            role: "admin",
+          };
         }
         return null;
       },

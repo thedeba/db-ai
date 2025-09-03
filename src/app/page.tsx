@@ -53,70 +53,6 @@ export default function Home() {
       setMessages(chat.messages);
     }
   };
-/*
-  const handleSendMessage = async (message: string) => {
-    // Add user message to chat
-    const userMessage: ChatMessage = { content: message, isUser: true };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setIsLoading(true);
-
-    // Update chat history
-    if (activeChat) {
-      setChats((prev) =>
-        prev.map((chat) =>
-          chat.id === activeChat
-            ? {
-                ...chat,
-                messages: updatedMessages,
-                title: message.slice(0, 30) + '...',
-              }
-            : chat
-        )
-      );
-    }
-
-    try {
-      // Replace with your Hugging Face Space API endpoint
-      const response = await fetch(selectedModel.endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ text: message }),
-      });
-
-      const data = await response.json();
-      
-      // Add AI response to chat
-      const aiMessage: ChatMessage = { content: data.response, isUser: false };
-      const newMessages = [...updatedMessages, aiMessage];
-      setMessages(newMessages);
-
-      // Update chat history
-      if (activeChat) {
-        setChats((prev) =>
-          prev.map((chat) =>
-            chat.id === activeChat
-              ? { ...chat, messages: newMessages }
-              : chat
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: ChatMessage = {
-        content: 'Sorry, something went wrong. Please try again.',
-        isUser: false,
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  }; 
-*/
-
 
 interface Chat {
   _id: string;
@@ -287,27 +223,36 @@ const handleSendMessage = async (message: string) => {
       <div className="flex flex-col flex-1 h-screen bg-[var(--background)] text-[var(--foreground)]">
         <Header isDarkMode={isDarkMode} onThemeToggle={toggleTheme} models={MODELS} selectedModel={selectedModel} onSelectModel={setSelectedModel}/>
         
-        <main className="flex-1 overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
-          <div className="flex flex-col h-full">
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 bg-[var(--background)] text-[var(--foreground)]">
-              {messages.map((message, index) => (
-                <Message key={index} {...message} />
-              ))}
-              {isLoading && (
-                <div className="flex justify-start mb-4">
-                  <div className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2 rounded-bl-none">
-                    <p className="text-sm">Thinking...</p>
+        <main
+          className={`flex-1 overflow-hidden bg-[var(--background)] text-[var(--foreground)] ${
+            messages.length === 0 ? "flex items-center justify-center" : ""
+          }`}
+        >
+          {messages.length > 0 ? (
+            <div className="flex flex-col h-full">
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {messages.map((message, index) => (
+                  <Message key={index} {...message} />
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start mb-4">
+                    <div className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg px-4 py-2 rounded-bl-none">
+                      <p className="text-sm">Thinking...</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+              {/* Chat input */}
+              <div className="border-t border-gray-200 dark:border-gray-700">
+                <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+              </div>
             </div>
-
-            {/* Chat input */}
-            <div className="border-t border-gray-200 dark:border-gray-700 bg-[var(--background)] text-[var(--foreground)]">
+          ) : (
+            <div className="w-full max-w-2xl mx-auto">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>

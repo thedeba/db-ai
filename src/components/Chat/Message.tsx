@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown';
+
 interface MessageProps {
   content: string;
   isUser: boolean;
@@ -13,7 +15,9 @@ export default function Message({ content, isUser }: MessageProps) {
             : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
         }`}
       >
-        <p className={`text-sm typewriter`}>{content}</p>
+        <div className="prose dark:prose-invert max-w-none">
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );
