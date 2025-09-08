@@ -34,7 +34,7 @@ export default function Sidebar({
   onToggleCollapse = () => {},
 }: SidebarProps) {
   return (
-    <div className={`relative flex flex-col ${isCollapsed ? 'w-16' : 'w-64'} bg-gray-800 dark:bg-gray-900 text-white h-screen transition-all duration-200`}>
+    <div className={`relative flex flex-col ${isCollapsed ? 'w-16' : 'w-64'} bg-gray-800 dark:bg-gray-900 text-white h-screen`}>
       
       {/* New Chat Button */}
       <div className="flex items-center px-3 py-2">
@@ -64,13 +64,13 @@ export default function Sidebar({
         {chats.map((chat) => (
           <div
             key={chat._id}
-            className={`flex items-center justify-between w-full p-3 hover:bg-gray-700 transition-colors ${ 
+            className={`flex items-center w-full p-3 hover:bg-gray-700 transition-colors ${ 
               activeChat === chat._id ? 'bg-gray-700' : ''
             }`}
           >
             <button
               onClick={() => onSelectChat(chat._id)}
-              className="flex items-center gap-2 flex-1 text-left min-w-0"
+              className="flex items-center gap-2 flex-1 text-left"
               title={isCollapsed ? chat.title : undefined}
             >
               <ChatBubbleLeftIcon className="h-5 w-5 flex-shrink-0" />
@@ -83,7 +83,7 @@ export default function Sidebar({
             {!isCollapsed && (
               <button
                 onClick={() => onDeleteChat(chat._id)}
-                className="ml-2 p-1 rounded-md hover:bg-gray-600 flex-shrink-0"
+                className="ml-2 p-1 rounded-md hover:bg-gray-600"
                 title="Delete Chat"
               >
                 <TrashIcon className="h-4 w-4 text-gray-400" />
@@ -92,6 +92,9 @@ export default function Sidebar({
           </div>
         ))}
       </div>
+
+      {/* Bottom Buttons: Settings & Admin Login */}
+      
     </div>
   );
 }
