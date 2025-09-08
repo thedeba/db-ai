@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon, TrashIcon, UserIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ChatBubbleLeftIcon, ChevronLeftIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 interface ChatMessage {
   content: string;
@@ -64,18 +64,18 @@ export default function Sidebar({
         {chats.map((chat) => (
           <div
             key={chat._id}
-            className={`flex items-center w-full p-3 hover:bg-gray-700 transition-colors ${ 
+            className={`flex items-center w-full p-3 hover:bg-gray-700 transition-colors min-w-0 ${ 
               activeChat === chat._id ? 'bg-gray-700' : ''
             }`}
           >
             <button
               onClick={() => onSelectChat(chat._id)}
-              className="flex items-center gap-2 flex-1 text-left"
+              className="flex items-center gap-2 flex-1 min-w-0 text-left"
               title={isCollapsed ? chat.title : undefined}
             >
               <ChatBubbleLeftIcon className="h-5 w-5 flex-shrink-0" />
               {!isCollapsed && (
-                <div className="truncate">
+                <div className="flex-1 min-w-0 truncate whitespace-nowrap">
                   {chat.title || (chat.messages && chat.messages.length > 0 ? chat.messages[0].content.slice(0, 30) + "..." : 'Chat')}
                 </div>
               )}
@@ -83,7 +83,7 @@ export default function Sidebar({
             {!isCollapsed && (
               <button
                 onClick={() => onDeleteChat(chat._id)}
-                className="ml-2 p-1 rounded-md hover:bg-gray-600"
+                className="ml-2 p-1 rounded-md hover:bg-gray-600 flex-shrink-0"
                 title="Delete Chat"
               >
                 <TrashIcon className="h-4 w-4 text-gray-400" />
