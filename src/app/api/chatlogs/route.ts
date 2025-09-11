@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/lib/auth';
 import ChatLog from '@/app/api/admin/models/ChatLog';
 import { connectDB } from '@/lib/mongodb';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
