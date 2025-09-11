@@ -5,12 +5,12 @@ export async function requireAdmin(req: NextRequest) {
     const isAdmin = req.cookies.get('isAdmin')?.value === 'true';
 
     if (!isAdmin) {
-      return NextResponse.redirect("/admin/login");
+      return NextResponse.redirect(new URL("/admin/login", req.url));
     }
 
     return null;
   } catch (error) {
     console.error('Admin auth error:', error);
-    return NextResponse.redirect("/admin/login");
+    return NextResponse.redirect(new URL("/admin/login", req.url));
   }
 }
