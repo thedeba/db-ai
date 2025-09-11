@@ -19,6 +19,7 @@ interface HeaderProps {
   models: Model[];
   selectedModel: Model;
   onSelectModel: (model: Model) => void;
+  isGuestMode?: boolean;
 }
 
 export default function Header({
@@ -27,6 +28,7 @@ export default function Header({
   models,
   selectedModel,
   onSelectModel,
+  isGuestMode = false,
 }: HeaderProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,27 +47,27 @@ export default function Header({
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b dark:border-gray-700 bg-[var(--background)] text-[var(--foreground)]">
 
-      {/* Logo */}
-      <div className="flex items-center gap-2">
-        <Image
-          src="/logo.svg"
-          alt="Logo"
-          width={32}
-          height={32}
-          className="rounded-full"
-        />
+      {/* Logo and Model */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo.svg"
+            alt="Logo"
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+          <span className="text-xl font-semibold text-gray-900 dark:text-white">Bangla GK</span>
+        </div>
 
         {/* Model selector dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="
-      group flex items-center gap-1 px-3 py-2 rounded-lg
-      bg-[var(--background)] text-[var(--foreground)]
-      focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
-    "          >
+            className="group flex items-center gap-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+          >
             {selectedModel.name}
-            <ChevronDownIcon className="w-15 h-4 text-[var(--foreground)]" />
+            <ChevronDownIcon className="w-4 h-4" />
           </button>
 
           {dropdownOpen && (
@@ -93,8 +95,20 @@ export default function Header({
         </div>
       </div>
 
+      {/* Center section - could add upgrade button here */}
+      <div className="flex-1 flex justify-center">
+        {/* Optional: Add upgrade button or other center content */}
+      </div>
+
       {/* Right side controls */}
       <div className="flex items-center gap-4">
+        {/* Guest mode indicator */}
+        {isGuestMode && (
+          <div className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-sm rounded-full border border-yellow-300 dark:border-yellow-700">
+            Guest Mode
+          </div>
+        )}
+
         {/* Theme toggle */}
         <button
           onClick={onThemeToggle}
@@ -108,7 +122,7 @@ export default function Header({
         </button>
 
         {/* Profile */}
-        <Profile />
+        <Profile isGuestMode={isGuestMode} />
       </div>
     </header>
   );

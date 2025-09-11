@@ -3,28 +3,18 @@ import clientPromise from '@/lib/mongodb';
 
 export async function GET() {
   try {
-
     const client = await clientPromise;
     console.log('MongoDB connected');
 
     // Use the test database
     const db = client.db('test');
     const usersCollection = db.collection('users');
-    
-    console.log('Fetching users from database...');
-    // First try to find just one user to verify the collection is accessible
-    const sampleUser = await usersCollection.findOne({});
-    console.log('Sample user found:', sampleUser ? 'Yes' : 'No');
-    
+
+    console.log('Fetching users from test database...');
     const users = await usersCollection.find({}).toArray();
-    console.log(`Found ${users.length} users in the database`);
-    
-    if (users.length === 0) {
-      console.log('No users found. Database might be empty or collection name might be incorrect.');
-      return NextResponse.json([]);
-    }
-    
-    // Clean and transform the data for JSON response
+    console.log(`Found ${users.length} users`);
+
+    // Transform the data for JSON response
     const cleanUsers = users.map(user => ({
       _id: user._id.toString(),
       name: user.name || '',
@@ -34,10 +24,9 @@ export async function GET() {
       lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString() : null
     }));
 
-    console.log('Sending response with users:', cleanUsers.length);
-    return NextResponse.json(cleanUsers); // ✅ fully serializable
-  } catch (err) {
-    console.error('Fetch Users API Error:', err);
+    return NextResponse.json(cleanUsers);
+  } catch (error) {
+    console.error('Error in users API:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }

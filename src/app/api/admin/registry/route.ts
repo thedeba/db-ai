@@ -1,14 +1,14 @@
-import clientPromise from '@/lib/mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/adminAuth';
+import clientPromise from '@/lib/mongodb';
 
 export async function GET(req: NextRequest) {
   const redirect = requireAdmin(req);
   if (redirect) return redirect;
   const client = await clientPromise;
   const db = client.db('db-ai');
-  const settings = await db.collection('settings').findOne({ key: 'generation' });
-  return NextResponse.json({ settings: settings?.value || { temperature: 0.7, min_p: 0.1 } });
+  const models = await db.collection('model_registry').find({}).toArray();
+  return NextResponse.json({ models });
 }
 
 export async function POST(req: NextRequest) {
@@ -17,11 +17,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const client = await clientPromise;
   const db = client.db('db-ai');
-  const { temperature, min_p } = body || {};
-  await db.collection('settings').updateOne(
-    { key: 'generation' },
-    { $set: { value: { temperature, min_p } } },
-    { upsert: true }
-  );
-  return NextResponse.json({ ok: true });
+  const result = await db.collection('model_registry').insertOne({ ...body, createdAt: new Date() });
+  return NextResponse.json({ model: { _id: result.insertedId, ...body } });
 }
+
+

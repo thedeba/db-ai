@@ -1,0 +1,75 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/adminAuth';
+import { connectDB } from '@/lib/mongodb';
+import ChatLog from '@/app/api/admin/models/ChatLog';
+import User from '@/app/api/admin/models/User';
+import Model from '@/app/api/admin/models/Model';
+
+export async function GET(req: NextRequest) {
+  try {
+    console.log('Starting stats API request...');
+
+    // Check admin authorization
+    const redirect = await requireAdmin(req);
+    if (redirect) {
+      console.log('Admin authorization failed');
+      return redirect;
+    }
+    console.log('Admin authorization successful');
+
+    // Connect to MongoDB
+    await connectDB();
+    console.log('MongoDB connected successfully');
+
+    try {
+      // Get users
+      console.log('Fetching users...');
+      const users = await User.find({}).lean();
+      console.log(`Found ${users.length} users`);
+
+      // Get chats
+      console.log('Fetching chats...');
+      const chats = await ChatLog.find({}).lean();
+      console.log(`Found ${chats.length} chats`);
+
+      // Get active models
+      console.log('Fetching active models...');
+      const models = await Model.find({ status: 'active' }).lean();
+      console.log(`Found ${models.length} active models`);
+
+      const responseData = {
+        totalUsers: users.length,
+        totalChats: chats.length,
+        activeModels: models.length,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('Sending response:', responseData);
+
+      return NextResponse.json(responseData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate'
+        }
+      });
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        { 
+          error: 'Database error',
+          details: dbError instanceof Error ? dbError.message : 'Failed to fetch data'
+        }, 
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error('Error in stats API:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }, 
+      { status: 500 }
+    );
+  }
+}

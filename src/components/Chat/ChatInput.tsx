@@ -1,4 +1,4 @@
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, PlusIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
 interface ChatInputProps {
@@ -18,28 +18,41 @@ export default function ChatInput({ onSendMessage, isLoading }: ChatInputProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative flex w-full max-w-2xl mx-auto">
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message..."
-        className="flex-1 resize-none rounded-lg border border-gray-300 dark:border-gray-600 p-4 pr-12 text-lg focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-        disabled={isLoading}
-        rows={1}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(e as unknown as React.FormEvent);
-          }
-        }}
-      />
-      <button
-        type="submit"
-        disabled={isLoading || !message.trim()}
-        className="absolute bottom-3 right-3 rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 disabled:bg-blue-300"
-      >
-        <PaperAirplaneIcon className="h-6 w-6" />
-      </button>
+    <form onSubmit={handleSubmit} className="relative flex w-full">
+      <div className="flex items-center w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow">
+        {/* Plus Icon */}
+        <button
+          type="button"
+          className="p-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+        >
+          <PlusIcon className="h-5 w-5" />
+        </button>
+        
+        {/* Input Field */}
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Ask anything"
+          className="flex-1 resize-none py-4 px-2 text-lg focus:outline-none bg-transparent text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+          disabled={isLoading}
+          rows={1}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit(e as unknown as React.FormEvent);
+            }
+          }}
+        />
+        
+        {/* Send Button */}
+        <button
+          type="submit"
+          disabled={isLoading || !message.trim()}
+          className="p-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <PaperAirplaneIcon className="h-5 w-5" />
+        </button>
+      </div>
     </form>
   );
 }
