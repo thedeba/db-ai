@@ -103,8 +103,8 @@ export default function AdminLoginPage() {
           throw new Error('Not authorized. Only admin users can access this area.');
         }
       }
-    } catch (e: any) {
-      setError(e.message || 'Failed to sign in with Google');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }

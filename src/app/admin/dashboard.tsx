@@ -25,7 +25,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   
   // Debug state
-  const [lastApiResponse, setLastApiResponse] = useState<any>(null);
+  const [lastApiResponse, setLastApiResponse] = useState<Record<string, unknown> | null>(null);
 
   const fetchStats = async () => {
     try {

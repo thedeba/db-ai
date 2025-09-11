@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirestore } from 'firebase-admin/firestore';
 import { requireAdmin } from '@/lib/adminAuth';
 
+import { NextApiRequest } from 'next';
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import Message from '@/components/Chat/Message';
 import ChatInput from '@/components/Chat/ChatInput';
 import TypingIndicator from '@/components/Chat/TypingIndicator';
@@ -24,8 +24,29 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isDarkMode, toggleTheme } = useTheme();
+  
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent session={session} status={status} router={router} isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+    </Suspense>
+  );
+}
+
+function HomeContent({
+  session,
+  status,
+  router,
+  isDarkMode,
+  toggleTheme
+}: {
+  session: any;
+  status: string;
+  router: any;
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}) {
+  const searchParams = useSearchParams();
 
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isGuestMode, setIsGuestMode] = useState(false);
